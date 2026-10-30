@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Математика: Бөлшектермен жұмыс</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        /* Custom Animations */
+        @keyframes pulse-subtle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .animate-pulse-subtle {
+            animation: pulse-subtle 2s infinite;
+        }
+
+        @keyframes bounce-short {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .animate-bounce-short {
+            animation: bounce-short 0.5s ease-in-out;
+        }
+
+        /* Fraction CSS layout */
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 4px;
+        }
+
+        .fraction-numerator {
+            border-bottom: 2px solid currentColor;
+            padding-bottom: 2px;
+            font-weight: 700;
+        }
+
+        .fraction-denominator {
+            padding-top: 2px;
+            font-weight: 700;
+        }
+
+        .mixed-fraction {
+            display: inline-flex;
+            align-items: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Header Section -->
+    <header class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="p-3 bg-white/10 rounded-2xl backdrop-blur-md border border-white/20">
+                    <i class="fa-solid font-bold fa-calculator text-2xl text-yellow-300"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-black tracking-tight">Бөлшектер Әлемі</h1>
+                    <p class="text-xs text-indigo-100 font-medium">Интерактивті оқу және жаттығу платформасы</p>
+                </div>
+            </div>
+            
+            <!-- Student Name Input Top -->
+            <div class="flex items-center space-x-2 bg-white/10 px-3 py-2 rounded-xl border border-white/20 w-full sm:w-auto">
+                <i class="fa-solid fa-user-graduate text-indigo-200"></i>
+                <input type="text" id="topStudentName" oninput="syncStudentName(this.value)" placeholder="Оқушының аты-жөні..." class="bg-transparent text-white placeholder-indigo-200 text-sm focus:outline-none w-full sm:w-56 font-medium">
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-white border-b border-slate-200 sticky top-[73px] z-40 shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 flex justify-around sm:justify-start space-x-1 sm:space-x-4 overflow-x-auto py-2">
+            <button onclick="switchTab(1)" id="tab-btn-1" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all text-indigo-600 bg-indigo-50 border border-indigo-200">
+                <span class="w-6 h-6 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center">1</span>
+                <span>Аралас → Бұрыс</span>
+            </button>
+            <button onclick="switchTab(2)" id="tab-btn-2" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-600 hover:bg-slate-100">
+                <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 text-xs flex items-center justify-center">2</span>
+                <span>Бұрыс → Аралас</span>
+            </button>
+            <button onclick="switchTab(3)" id="tab-btn-3" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-600 hover:bg-slate-100">
+                <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 text-xs flex items-center justify-center">3</span>
+                <span>Ортақ Бөлім</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="max-w-5xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- SECTION 1: Mixed to Improper -->
+        <section id="section-1" class="tab-content space-y-6">
+            <!-- Animation & Lesson Demo Card -->
+            <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white p-6 rounded-3xl shadow-xl relative overflow-hidden border border-indigo-500/30">
+                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="flex items-center justify-between mb-4 border-b border-indigo-800/80 pb-3">
+                    <h2 class="text-lg font-bold flex items-center text-yellow-400">
+                        <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> 1-бөлім: Аралас бөлшекті бұрыс бөлшекке айналдыру
+                    </h2>
+                    <span class="text-xs bg-indigo-500/30 text-indigo-200 px-3 py-1 rounded-full border border-indigo-400/30 font-semibold">Интерактивті түсіндірме</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                    <!-- Rule Box -->
+                    <div class="md:col-span-5 bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-sm space-y-2">
+                        <p class="text-sm text-indigo-200 font-medium">Ереже:</p>
+                        <ol class="text-xs space-y-2 text-slate-300 list-decimal list-inside">
+                            <li>Бүтінді бөліміне <strong class="text-yellow-300">көбейту</strong>: $(A \times C)$</li>
+                            <li>Нәтижеге алымын <strong class="text-green-300">қосу</strong>: $(A \times C) + B$</li>
+                            <li>Шыққан санды <strong class="text-pink-300">алымына</strong> жазу, бөлімі өзгермейді.</li>
+                        </ol>
+                    </div>
+
+                    <!-- Interactive Step-by-Step Animation Box -->
+                    <div class="md:col-span-7 bg-slate-800/90 p-5 rounded-2xl border border-indigo-500/40 text-center flex flex-col justify-between min-h-[220px]">
+                        <div class="text-xs text-indigo-300 font-semibold uppercase tracking-wider mb-2 flex justify-between items-center">
+                            <span>Интерактивті Мысал: <span id="demo1-title" class="text-white font-bold">2 3/5</span></span>
+                            <span id="demo1-step-badge" class="bg-indigo-600 text-white px-2 py-0.5 rounded text-[10px]">1/3 Қадам</span>
+                        </div>
+
+                        <!-- Visual Fraction Display -->
+                        <div class="py-4 flex justify-center items-center space-x-4 text-2xl font-bold min-h-[90px]" id="demo1-canvas">
+                            <!-- Dynamic Content Inserted by JS -->
+                        </div>
+
+                        <!-- Step Description -->
+                        <p id="demo1-desc" class="text-xs text-slate-200 bg-slate-900/60 p-2.5 rounded-xl border border-slate-700 min-h-[42px] flex items-center justify-center">
+                            Тиісті түсіндірме осы жерде көрсетіледі.
+                        </p>
+
+                        <!-- Controls -->
+                        <div class="flex justify-between items-center mt-4 pt-2 border-t border-slate-700/50">
+                            <div class="flex space-x-1">
+                                <button onclick="selectDemo1Example(0)" class="px-2 py-1 text-xs rounded bg-slate-700 hover:bg-slate-600 text-slate-300 transition">1-мысал</button>
+                                <button onclick="selectDemo1Example(1)" class="px-2 py-1 text-xs rounded bg-slate-700 hover:bg-slate-600 text-slate-300 transition">2-мысал</button>
+                                <button onclick="selectDemo1Example(2)" class="px-2 py-1 text-xs rounded bg-slate-700 hover:bg-slate-600 text-slate-300 transition">3-мысал</button>
+                            </div>
+                            <button onclick="nextDemo1Step()" class="bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-bold px-4 py-1.5 rounded-xl text-xs flex items-center space-x-1 transition shadow-lg shadow-yellow-500/20">
+                                <span>Келесі кезең</span>
+                                <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercises Container -->
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-lg font-extrabold text-slate-800">Тапсырмалар (15 есеп)</h3>
+                        <p class="text-xs text-slate-500">Бөлшекті бұрыс бөлшекке айналдырып, бос ұяшықтарды толтырыңыз.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="quiz-grid-1">
+                    <!-- Dynamic Questions 1..15 -->
+                </div>
+
+                <!-- Section Result Box -->
+                <div class="mt-8 p-6 bg-slate-50 border border-indigo-100 rounded-3xl space-y-4">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="w-full sm:w-auto flex-1">
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Оқушының аты-жөні:</label>
+                            <input type="text" id="studentNameSec1" oninput="syncStudentName(this.value)" placeholder="Мысалы: Болатұлы Әлішер" class="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-sm font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        </div>
+                        <button onclick="checkSection(1)" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3 rounded-2xl text-sm transition shadow-lg shadow-indigo-600/30 flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-square-check"></i>
+                            <span>1-бөлімді тексеру</span>
+                        </button>
+                    </div>
+
+                    <!-- Result Display -->
+                    <div id="resultCard1" class="hidden p-5 bg-white border-2 border-indigo-500 rounded-2xl shadow-md text-center space-y-2 animate-bounce-short">
+                        <div class="text-xs font-extrabold uppercase text-indigo-600 tracking-wider">1-Бөлім Нәтижесі</div>
+                        <div class="text-base font-bold text-slate-800" id="res1Student"></div>
+                        <div class="text-3xl font-black text-indigo-600" id="res1Score">0 / 15</div>
+                        <p class="text-xs text-slate-600 font-medium" id="res1Comment"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Improper to Mixed -->
+        <section id="section-2" class="tab-content hidden space-y-6">
+            <!-- Animation & Lesson Demo Card -->
+            <div class="bg-gradient-to-br from-emerald-900 to-slate-900 text-white p-6 rounded-3xl shadow-xl relative overflow-hidden border border-emerald-500/30">
+                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="flex items-center justify-between mb-4 border-b border-emerald-800/80 pb-3">
+                    <h2 class="text-lg font-bold flex items-center text-emerald-400">
+                        <i class="fa-solid fa-rotate mr-2"></i> 2-бөлім: Бұрыс бөлшекті аралас бөлшекке айналдыру
+                    </h2>
+                    <span class="text-xs bg-emerald-500/30 text-emerald-200 px-3 py-1 rounded-full border border-emerald-400/30 font-semibold">Интерактивті түсіндірме</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                    <!-- Rule Box -->
+                    <div class="md:col-span-5 bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-sm space-y-2">
+                        <p class="text-sm text-emerald-200 font-medium">Ереже:</p>
+                        <ol class="text-xs space-y-2 text-slate-300 list-decimal list-inside">
+                            <li>Алымын бөліміне қалдықпен бөлеміз: $\text{Алым} \div \text{Бөлім}$</li>
+                            <li>Бөліндіні (бүтінді) <strong class="text-amber-300">бүтін бөлікке</strong> жазамыз.</li>
+                            <li>Қалдықты <strong class="text-emerald-300">алымына</strong> жазамыз, бөлімі өзгермейді.</li>
+                        </ol>
+                    </div>
+
+                    <!-- Step-by-Step Box -->
+                    <div class="md:col-span-7 bg-slate-800/90 p-5 rounded-2xl border border-emerald-500/40 text-center flex flex-col justify-between min-h-[220px]">
+                        <div class="text-xs text-emerald-300 font-semibold uppercase tracking-wider mb-2 flex justify-between items-center">
+                            <span>Интерактивті Мысал: <span id="demo2-title" class="text-white font-bold">14 / 3</span></span>
+                            <span id="demo2-step-badge" class="bg-emerald-600 text-white px-2 py-0.5 rounded text-[10px]">1/3 Қадам</span>
+                        </div>
+
+                        <!-- Visual Fraction Display -->
+                        <div class="py-4 flex justify-center items-center space-x-4 text-2xl font-bold min-h-[90px]" id="demo2-canvas">
+                            <!-- Dynamic Content -->
+                        </div>
+
+                        <p id="demo2-desc" class="text-xs text-slate-200 bg-slate-900/60 p-2.5 rounded-xl border border-slate-700 min-h-[42px] flex items-center justify-center">
+                            Түсіндірме мәтіні.
+                        </p>
+
+                        <div class="flex justify-between items-center mt-4 pt-2 border-t border-slate-700/50">
+                            <div class="flex space-x-1">
+                                <button onclick="selectDemo2Example(0)" class="px-2 py-1 text-xs rounded bg-slate-700 hover:bg-slate-600 text-slate-300 transition">1-мысал</button>
+                                <button onclick="selectDemo2Example(1)" class="px-2 py-1 text-xs rounded bg-slate-700 hover:bg-slate-600 text-slate-300 transition">2-мысал</button>
+                                <button onclick="selectDemo2Example(2)" class="px-2 py-1 text-xs rounded bg-slate-700 hover:bg-slate-600 text-slate-300 transition">3-мысал</button>
+                            </div>
+                            <button onclick="nextDemo2Step()" class="bg-emerald-400 hover:bg-emerald-300 text-slate-900 font-bold px-4 py-1.5 rounded-xl text-xs flex items-center space-x-1 transition shadow-lg shadow-emerald-500/20">
+                                <span>Келесі кезең</span>
+                                <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercises Container -->
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-lg font-extrabold text-slate-800">Тапсырмалар (15 есеп)</h3>
+                        <p class="text-xs text-slate-500">Бұрыс бөлшекті аралас бөлшекке айналдырыңыз.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="quiz-grid-2">
+                    <!-- Dynamic Questions -->
+                </div>
+
+                <!-- Section Result Box -->
+                <div class="mt-8 p-6 bg-slate-50 border border-emerald-100 rounded-3xl space-y-4">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="w-full sm:w-auto flex-1">
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Оқушының аты-жөні:</label>
+                            <input type="text" id="studentNameSec2" oninput="syncStudentName(this.value)" placeholder="Мысалы: Болатұлы Әлішер" class="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        </div>
+                        <button onclick="checkSection(2)" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-3 rounded-2xl text-sm transition shadow-lg shadow-emerald-600/30 flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-square-check"></i>
+                            <span>2-бөлімді тексеру</span>
+                        </button>
+                    </div>
+
+                    <!-- Result Display -->
+                    <div id="resultCard2" class="hidden p-5 bg-white border-2 border-emerald-500 rounded-2xl shadow-md text-center space-y-2 animate-bounce-short">
+                        <div class="text-xs font-extrabold uppercase text-emerald-600 tracking-wider">2-Бөлім Нәтижесі</div>
+                        <div class="text-base font-bold text-slate-800" id="res2Student"></div>
+                        <div class="text-3xl font-black text-emerald-600" id="res2Score">0 / 15</div>
+                        <p class="text-xs text-slate-600 font-medium" id="res2Comment"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Common Denominator -->
+        <section id="section-3" class="tab-content hidden space-y-6">
+            <!-- Animation & Lesson Demo Card -->
+            <div class="bg-gradient-to-br from-purple-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-8 rounded-3xl shadow-2xl relative overflow-hidden border-2 border-purple-500/40">
+                <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 border-b border-purple-800/80 pb-4 gap-2">
+                    <h2 class="text-xl sm:text-2xl font-black flex items-center text-purple-300">
+                        <i class="fa-solid fa-layer-group mr-3 text-yellow-400"></i> 3-бөлім: Екі бөлшекті ортақ бөлімге келтіру
+                    </h2>
+                    <span class="text-xs bg-purple-500/30 text-purple-200 px-3 py-1.5 rounded-full border border-purple-400/30 font-bold self-start sm:self-auto">Толық & Анық түсіндірме</span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                    <!-- Rule Box -->
+                    <div class="lg:col-span-4 bg-white/5 p-5 rounded-2xl border border-white/10 backdrop-blur-sm flex flex-col justify-between space-y-3">
+                        <div>
+                            <p class="text-sm text-purple-200 font-bold mb-2 flex items-center">
+                                <i class="fa-solid fa-book-bookmark mr-2 text-yellow-300"></i> Ереже және 3 негізгі қадам:
+                            </p>
+                            <ol class="text-xs space-y-2.5 text-slate-200 list-decimal list-inside font-medium leading-relaxed">
+                                <li><strong class="text-yellow-300">Ортақ бөлім табу:</strong> Екі бөлігіне де бөлінетін ең кіші санды табамыз.</li>
+                                <li><strong class="text-amber-300">Көбейту:</strong> Ортақ бөлімді екі бөлшектің де бөлімдеріне бөліп, <span class="text-yellow-300 font-bold">толықтауыш көбейткіштерін</span> анықтаймыз.</li>
+                                <li><strong class="text-green-300">Жаңа бөлшек жазу:</strong> Әр бөлшектің алымы мен бөлімін осы сандарға көбейтіп шығарамыз.</li>
+                            </ol>
+                        </div>
+                        <div class="text-[11px] bg-purple-950/60 p-2.5 rounded-xl border border-purple-800/80 text-purple-200 text-center font-semibold">
+                            💡 Есептегі бос ұяшықтарға тура осы соңғы шыққан сандар жазылады!
+                        </div>
+                    </div>
+
+                    <!-- Step-by-Step Box -->
+                    <div class="lg:col-span-8 bg-slate-900/95 p-6 rounded-2xl border-2 border-purple-500/50 shadow-inner text-center flex flex-col justify-between min-h-[300px]">
+                        <div class="text-xs text-purple-300 font-bold uppercase tracking-wider mb-2 flex justify-between items-center border-b border-slate-800 pb-2">
+                            <span>Түсіндірме мысал: <span id="demo3-title" class="text-yellow-300 text-sm font-black">1/4 және 2/3</span></span>
+                            <span id="demo3-step-badge" class="bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold">1/3 Кезең</span>
+                        </div>
+
+                        <!-- Visual Fraction Display -->
+                        <div class="py-4 flex justify-center items-center min-h-[140px]" id="demo3-canvas">
+                            <!-- Dynamic Detailed Content -->
+                        </div>
+
+                        <!-- Step Detailed Description -->
+                        <div id="demo3-desc" class="text-xs sm:text-sm text-slate-100 bg-slate-800/90 p-4 rounded-xl border border-slate-700 font-medium leading-relaxed shadow">
+                            Түсіндірме мәтіні.
+                        </div>
+
+                        <!-- Controls -->
+                        <div class="flex flex-col sm:flex-row justify-between items-center mt-4 pt-3 border-t border-slate-800 gap-3">
+                            <div class="flex space-x-2">
+                                <button onclick="selectDemo3Example(0)" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">1-мысал (1/4, 2/3)</button>
+                                <button onclick="selectDemo3Example(1)" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">2-мысал (3/5, 1/2)</button>
+                                <button onclick="selectDemo3Example(2)" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">3-мысал (1/6, 3/8)</button>
+                            </div>
+                            <button onclick="nextDemo3Step()" class="w-full sm:w-auto bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-slate-950 font-extrabold px-6 py-2 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 transition shadow-lg shadow-yellow-500/20">
+                                <span>Келесі қадамды көру</span>
+                                <i class="fa-solid fa-circle-arrow-right text-base"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercises Container -->
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-lg font-extrabold text-slate-800">Тапсырмалар (15 есеп)</h3>
+                        <p class="text-xs text-slate-500">Бөлшектерді ең кіші ортақ бөлімге келтіріңіз.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="quiz-grid-3">
+                    <!-- Dynamic Questions -->
+                </div>
+
+                <!-- Section Result Box -->
+                <div class="mt-8 p-6 bg-slate-50 border border-purple-100 rounded-3xl space-y-4">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="w-full sm:w-auto flex-1">
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Оқушының аты-жөні:</label>
+                            <input type="text" id="studentNameSec3" oninput="syncStudentName(this.value)" placeholder="Мысалы: Болатұлы Әлішер" class="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-sm font-semibold focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        </div>
+                        <button onclick="checkSection(3)" class="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-3 rounded-2xl text-sm transition shadow-lg shadow-purple-600/30 flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-square-check"></i>
+                            <span>3-бөлімді тексеру</span>
+                        </button>
+                    </div>
+
+                    <!-- Result Display -->
+                    <div id="resultCard3" class="hidden p-5 bg-white border-2 border-purple-500 rounded-2xl shadow-md text-center space-y-2 animate-bounce-short">
+                        <div class="text-xs font-extrabold uppercase text-purple-600 tracking-wider">3-Бөлім Нәтижесі</div>
+                        <div class="text-base font-bold text-slate-800" id="res3Student"></div>
+                        <div class="text-3xl font-black text-purple-600" id="res3Score">0 / 15</div>
+                        <p class="text-xs text-slate-600 font-medium" id="res3Comment"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 mt-12 border-t border-slate-800">
+        <div class="max-w-5xl mx-auto px-4 text-center">
+            <p class="font-semibold text-slate-300">Математика пәні бойынша интерактивті тапсырмалар жинағы</p>
+            <p class="text-slate-500 mt-1">Оқушылар жауаптарды өздері толтырып, әр бөлімді жеке тексере алады.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Synchronize student name input across header and all section forms
+        function syncStudentName(value) {
+            document.getElementById('topStudentName').value = value;
+            document.getElementById('studentNameSec1').value = value;
+            document.getElementById('studentNameSec2').value = value;
+            document.getElementById('studentNameSec3').value = value;
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabNum) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = 'tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-600 hover:bg-slate-100';
+                btn.querySelector('span').className = 'w-6 h-6 rounded-full bg-slate-200 text-slate-700 text-xs flex items-center justify-center';
+            });
+
+            document.getElementById(`section-${tabNum}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabNum}`);
+            
+            if (tabNum === 1) {
+                activeBtn.className = 'tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all text-indigo-600 bg-indigo-50 border border-indigo-200';
+                activeBtn.querySelector('span').className = 'w-6 h-6 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center';
+            } else if (tabNum === 2) {
+                activeBtn.className = 'tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all text-emerald-600 bg-emerald-50 border border-emerald-200';
+                activeBtn.querySelector('span').className = 'w-6 h-6 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center';
+            } else if (tabNum === 3) {
+                activeBtn.className = 'tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all text-purple-600 bg-purple-50 border border-purple-200';
+                activeBtn.querySelector('span').className = 'w-6 h-6 rounded-full bg-purple-600 text-white text-xs flex items-center justify-center';
+            }
+        }
+
+        // --- Data Questions ---
+        const qData1 = [
+            { w: 1, n: 2, d: 3, ansN: 5, ansD: 3 },
+            { w: 3, n: 1, d: 4, ansN: 13, ansD: 4 },
+            { w: 2, n: 2, d: 5, ansN: 12, ansD: 5 },
+            { w: 4, n: 3, d: 8, ansN: 35, ansD: 8 },
+            { w: 5, n: 1, d: 2, ansN: 11, ansD: 2 },
+            { w: 2, n: 4, d: 9, ansN: 22, ansD: 9 },
+            { w: 6, n: 2, d: 3, ansN: 20, ansD: 3 },
+            { w: 3, n: 5, d: 6, ansN: 23, ansD: 6 },
+            { w: 7, n: 1, d: 3, ansN: 22, ansD: 3 },
+            { w: 1, n: 7, d: 10, ansN: 17, ansD: 10 },
+            { w: 4, n: 2, d: 7, ansN: 30, ansD: 7 },
+            { w: 8, n: 1, d: 5, ansN: 41, ansD: 5 },
+            { w: 5, n: 3, d: 4, ansN: 23, ansD: 4 },
+            { w: 2, n: 5, d: 11, ansN: 27, ansD: 11 },
+            { w: 9, n: 1, d: 2, ansN: 19, ansD: 2 }
+        ];
+
+        const qData2 = [
+            { n: 7, d: 2, ansW: 3, ansN: 1, ansD: 2 },
+            { n: 11, d: 3, ansW: 3, ansN: 2, ansD: 3 },
+            { n: 13, d: 4, ansW: 3, ansN: 1, ansD: 4 },
+            { n: 17, d: 5, ansW: 3, ansN: 2, ansD: 5 },
+            { n: 22, d: 7, ansW: 3, ansN: 1, ansD: 7 },
+            { n: 19, d: 6, ansW: 3, ansN: 1, ansD: 6 },
+            { n: 29, d: 8, ansW: 3, ansN: 5, ansD: 8 },
+            { n: 31, d: 9, ansW: 3, ansN: 4, ansD: 9 },
+            { n: 16, d: 3, ansW: 5, ansN: 1, ansD: 3 },
+            { n: 27, d: 5, ansW: 5, ansN: 2, ansD: 5 },
+            { n: 35, d: 6, ansW: 5, ansN: 5, ansD: 6 },
+            { n: 43, d: 10, ansW: 4, ansN: 3, ansD: 10 },
+            { n: 25, d: 4, ansW: 6, ansN: 1, ansD: 4 },
+            { n: 38, d: 7, ansW: 5, ansN: 3, ansD: 7 },
+            { n: 53, d: 9, ansW: 5, ansN: 8, ansD: 9 }
+        ];
+
+        const qData3 = [
+            { f1: [1, 2], f2: [1, 3], ans1: [3, 6], ans2: [2, 6] },
+            { f1: [2, 5], f2: [1, 4], ans1: [8, 20], ans2: [5, 20] },
+            { f1: [1, 3], f2: [3, 4], ans1: [4, 12], ans2: [9, 12] },
+            { f1: [2, 3], f2: [1, 5], ans1: [10, 15], ans2: [3, 15] },
+            { f1: [1, 4], f2: [1, 6], ans1: [3, 12], ans2: [2, 12] },
+            { f1: [3, 5], f2: [7, 10], ans1: [6, 10], ans2: [7, 10] },
+            { f1: [1, 2], f2: [3, 7], ans1: [7, 14], ans2: [6, 14] },
+            { f1: [5, 6], f2: [1, 4], ans1: [10, 12], ans2: [3, 12] },
+            { f1: [2, 7], f2: [1, 3], ans1: [6, 21], ans2: [7, 21] },
+            { f1: [3, 8], f2: [1, 2], ans1: [3, 8], ans2: [4, 8] },
+            { f1: [4, 9], f2: [1, 3], ans1: [4, 9], ans2: [3, 9] },
+            { f1: [2, 5], f2: [3, 8], ans1: [16, 40], ans2: [15, 40] },
+            { f1: [1, 6], f2: [2, 9], ans1: [3, 18], ans2: [4, 18] },
+            { f1: [3, 4], f2: [2, 7], ans1: [21, 28], ans2: [8, 28] },
+            { f1: [5, 12], f2: [1, 3], ans1: [5, 12], ans2: [4, 12] }
+        ];
+
+        // --- Demo 1 ---
+        const demo1Examples = [
+            { w: 2, n: 3, d: 5 },
+            { w: 4, n: 1, d: 2 },
+            { w: 3, n: 4, d: 7 }
+        ];
+        let demo1CurrentEx = 0;
+        let demo1Step = 0;
+
+        function selectDemo1Example(idx) {
+            demo1CurrentEx = idx;
+            demo1Step = 0;
+            renderDemo1();
+        }
+
+        function nextDemo1Step() {
+            demo1Step = (demo1Step + 1) % 3;
+            renderDemo1();
+        }
+
+        function renderDemo1() {
+            const ex = demo1Examples[demo1CurrentEx];
+            const canvas = document.getElementById('demo1-canvas');
+            const desc = document.getElementById('demo1-desc');
+            const title = document.getElementById('demo1-title');
+            const badge = document.getElementById('demo1-step-badge');
+
+            title.innerText = `${ex.w} ${ex.n}/${ex.d}`;
+            badge.innerText = `${demo1Step + 1}/3 Қадам`;
+
+            if (demo1Step === 0) {
+                canvas.innerHTML = `
+                    <div class="mixed-fraction text-3xl font-black">
+                        <span class="text-amber-300 mr-1 animate-pulse-subtle">${ex.w}</span>
+                        <div class="fraction text-indigo-300">
+                            <span class="fraction-numerator">${ex.n}</span>
+                            <span class="fraction-denominator text-yellow-300 font-extrabold underline">${ex.d}</span>
+                        </div>
+                    </div>
+                    <span class="text-slate-500 text-base">→</span>
+                    <div class="text-yellow-300 font-black text-xl bg-slate-900 px-3 py-1.5 rounded-xl border border-yellow-500/30">
+                        ${ex.w} × ${ex.d} = ${ex.w * ex.d}
+                    </div>
+                `;
+                desc.innerHTML = `<strong>1-кезең (Көбейту):</strong> Бүтін бөлікті (${ex.w}) бөліміне (${ex.d}) көбейтеміз: <b>${ex.w} × ${ex.d} = ${ex.w * ex.d}</b>`;
+            } else if (demo1Step === 1) {
+                const prod = ex.w * ex.d;
+                canvas.innerHTML = `
+                    <div class="text-base text-slate-300 bg-slate-900 px-4 py-2 rounded-xl border border-indigo-500/40">
+                        (${ex.w} × ${ex.d}) + <span class="text-pink-400 font-black">${ex.n}</span> = 
+                        <span class="text-emerald-400 font-black text-2xl animate-bounce-short">${prod + ex.n}</span>
+                    </div>
+                `;
+                desc.innerHTML = `<strong>2-кезең (Қосу):</strong> Шыққан нәтижеге (${prod}) алымын (${ex.n}) қосамыз: <b>${prod} + ${ex.n} = ${prod + ex.n}</b> (бұл бұрыс бөлшектің жаңа алымы болады).`;
+            } else {
+                const total = (ex.w * ex.d) + ex.n;
+                canvas.innerHTML = `
+                    <div class="mixed-fraction text-slate-400 text-lg mr-2">
+                        <span>${ex.w}</span>
+                        <div class="fraction">
+                            <span class="fraction-numerator">${ex.n}</span>
+                            <span class="fraction-denominator">${ex.d}</span>
+                        </div>
+                    </div>
+                    <span class="text-yellow-400 font-bold text-xl">=</span>
+                    <div class="fraction text-3xl font-black text-emerald-400 ml-2">
+                        <span class="fraction-numerator border-emerald-400">${total}</span>
+                        <span class="fraction-denominator">${ex.d}</span>
+                    </div>
+                `;
+                desc.innerHTML = `<strong>3-кезең (Нәтиже):</strong> Жинақталған санды алымына жазып, бөлімін өзгеріссіз қалдырамыз: <b>${total}/${ex.d}</b>!`;
+            }
+        }
+
+        // --- Demo 2 ---
+        const demo2Examples = [
+            { n: 14, d: 3 },
+            { n: 23, d: 5 },
+            { n: 19, d: 4 }
+        ];
+        let demo2CurrentEx = 0;
+        let demo2Step = 0;
+
+        function selectDemo2Example(idx) {
+            demo2CurrentEx = idx;
+            demo2Step = 0;
+            renderDemo2();
+        }
+
+        function nextDemo2Step() {
+            demo2Step = (demo2Step + 1) % 3;
+            renderDemo2();
+        }
+
+        function renderDemo2() {
+            const ex = demo2Examples[demo2CurrentEx];
+            const canvas = document.getElementById('demo2-canvas');
+            const desc = document.getElementById('demo2-desc');
+            const title = document.getElementById('demo2-title');
+            const badge = document.getElementById('demo2-step-badge');
+
+            title.innerText = `${ex.n} / ${ex.d}`;
+            badge.innerText = `${demo2Step + 1}/3 Қадам`;
+
+            const w = Math.floor(ex.n / ex.d);
+            const rem = ex.n % ex.d;
+
+            if (demo2Step === 0) {
+                canvas.innerHTML = `
+                    <div class="fraction text-emerald-300 mr-2">
+                        <span class="fraction-numerator">${ex.n}</span>
+                        <span class="fraction-denominator">${ex.d}</span>
+                    </div>
+                    <span class="text-slate-500 text-sm">→</span>
+                    <div class="bg-emerald-950 px-4 py-2 rounded-xl border border-emerald-700 text-base">
+                        <span class="text-white font-bold">${ex.n}</span> ÷ <span class="text-emerald-300 font-bold">${ex.d}</span> = <span class="text-amber-400 font-black text-xl">${w}</span>
+                        <span class="text-xs text-slate-300 ml-1">(қалдық: <b class="text-pink-400">${rem}</b>)</span>
+                    </div>
+                `;
+                desc.innerHTML = `<strong>1-кезең (Бөлу):</strong> Алымын бөліміне қалдықпен бөлеміз: <b>${ex.n} ÷ ${ex.d} = ${w}</b> (қалдық <b>${rem}</b>).`;
+            } else if (demo2Step === 1) {
+                canvas.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="text-xs text-slate-400">Бүтін бөлік:</span>
+                        <span class="text-amber-400 text-4xl font-black animate-bounce-short">${w}</span>
+                    </div>
+                `;
+                desc.innerHTML = `<strong>2-кезең (Бүтін бөлігі):</strong> Толымсыз бөлінді <b class="text-amber-400">${w}</b> — аралас бөлшектің <b>бүтін бөлігі</b> болып жазылады.`;
+            } else {
+                canvas.innerHTML = `
+                    <div class="fraction text-slate-400 text-sm mr-2">
+                        <span class="fraction-numerator">${ex.n}</span>
+                        <span class="fraction-denominator">${ex.d}</span>
+                    </div>
+                    <span class="text-emerald-400 font-bold text-xl">=</span>
+                    <div class="mixed-fraction text-2xl font-bold ml-2">
+                        <span class="text-amber-400 text-3xl mr-1 font-black">${w}</span>
+                        <div class="fraction text-emerald-300">
+                            <span class="fraction-numerator border-emerald-300 text-pink-400 animate-bounce-short">${rem}</span>
+                            <span class="fraction-denominator">${ex.d}</span>
+                        </div>
+                    </div>
+                `;
+                desc.innerHTML = `<strong>3-кезең (Нәтиже):</strong> Қалдық <b>${rem}</b> алымына, ал бөлімі <b>${ex.d}</b> өзгеріссіз орнына жазылады: <b>${w} ${rem}/${ex.d}</b>!`;
+            }
+        }
+
+        // --- Demo 3 ---
+        const demo3Examples = [
+            { f1: [1, 4], f2: [2, 3], lcm: 12, m1: 3, m2: 4, r1: [3, 12], r2: [8, 12] },
+            { f1: [3, 5], f2: [1, 2], lcm: 10, m1: 2, m2: 5, r1: [6, 10], r2: [5, 10] },
+            { f1: [1, 6], f2: [3, 8], lcm: 24, m1: 4, m2: 3, r1: [4, 24], r2: [9, 24] }
+        ];
+        let demo3CurrentEx = 0;
+        let demo3Step = 0;
+
+        function selectDemo3Example(idx) {
+            demo3CurrentEx = idx;
+            demo3Step = 0;
+            renderDemo3();
+        }
+
+        function nextDemo3Step() {
+            demo3Step = (demo3Step + 1) % 3;
+            renderDemo3();
+        }
+
+        function renderDemo3() {
+            const ex = demo3Examples[demo3CurrentEx];
+            const canvas = document.getElementById('demo3-canvas');
+            const desc = document.getElementById('demo3-desc');
+            const title = document.getElementById('demo3-title');
+            const badge = document.getElementById('demo3-step-badge');
+
+            title.innerText = `${ex.f1[0]}/${ex.f1[1]} және ${ex.f2[0]}/${ex.f2[1]}`;
+            badge.innerText = `${demo3Step + 1}/3 Кезең`;
+
+            if (demo3Step === 0) {
+                canvas.innerHTML = `
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+                        <div class="flex items-center space-x-3 bg-slate-800/80 px-5 py-3 rounded-2xl border border-purple-500/40 shadow-inner">
+                            <div class="fraction text-xl font-black text-purple-300">
+                                <span class="fraction-numerator">${ex.f1[0]}</span>
+                                <span class="fraction-denominator text-yellow-300 underline font-extrabold">${ex.f1[1]}</span>
+                            </div>
+                            <span class="text-sm font-bold text-slate-400">және</span>
+                            <div class="fraction text-xl font-black text-purple-300">
+                                <span class="fraction-numerator">${ex.f2[0]}</span>
+                                <span class="fraction-denominator text-yellow-300 underline font-extrabold">${ex.f2[1]}</span>
+                            </div>
+                        </div>
+
+                        <i class="fa-solid fa-arrow-right text-yellow-400 text-xl hidden sm:block"></i>
+                        <i class="fa-solid fa-arrow-down text-yellow-400 text-xl sm:hidden"></i>
+
+                        <div class="bg-gradient-to-r from-purple-900 to-indigo-900 px-5 py-3 rounded-2xl border-2 border-yellow-400 text-center shadow-lg">
+                            <span class="text-xs text-purple-200 block font-semibold">Екі бөлігіне де бөлінетін сан:</span>
+                            <span class="text-2xl font-black text-yellow-300">Ортақ бөлім = ${ex.lcm}</span>
+                        </div>
+                    </div>
+                `;
+                desc.innerHTML = `<strong>1-КЕЗЕҢ (Ортақ бөлім табу):</strong> <b class="text-yellow-300">${ex.f1[1]}</b> және <b class="text-yellow-300">${ex.f2[1]}</b> сандарының екеуіне де бөлінетін ең кіші сан — <b class="text-yellow-300 text-lg">${ex.lcm}</b>. Осы сан екі бөлшектің де жаңа бөлімі болады!`;
+            } else if (demo3Step === 1) {
+                canvas.innerHTML = `
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-lg">
+                        <div class="bg-purple-950/80 p-3.5 rounded-2xl border border-purple-500/50 text-left space-y-1">
+                            <div class="text-xs text-slate-300 font-semibold">Бірінші бөлшек (${ex.f1[0]}/${ex.f1[1]}):</div>
+                            <div class="text-xs text-purple-200">Бөлу: ${ex.lcm} ÷ ${ex.f1[1]} = <span class="text-yellow-300 font-bold text-base">(${ex.m1})</span></div>
+                            <div class="text-xs text-slate-200">Көбейту: (${ex.f1[0]} × <span class="text-yellow-300 font-bold">${ex.m1}</span>) / (${ex.f1[1]} × <span class="text-yellow-300 font-bold">${ex.m1}</span>)</div>
+                        </div>
+                        <div class="bg-indigo-950/80 p-3.5 rounded-2xl border border-indigo-500/50 text-left space-y-1">
+                            <div class="text-xs text-slate-300 font-semibold">Екінші бөлшек (${ex.f2[0]}/${ex.f2[1]}):</div>
+                            <div class="text-xs text-indigo-200">Бөлу: ${ex.lcm} ÷ ${ex.f2[1]} = <span class="text-yellow-300 font-bold text-base">(${ex.m2})</span></div>
+                            <div class="text-xs text-slate-200">Көбейту: (${ex.f2[0]} × <span class="text-yellow-300 font-bold">${ex.m2}</span>) / (${ex.f2[1]} × <span class="text-yellow-300 font-bold">${ex.m2}</span>)</div>
+                        </div>
+                    </div>
+                `;
+                desc.innerHTML = `<strong>2-КЕЗЕҢ (Көбейту):</strong> Ортақ бөлімді (${ex.lcm}) бөлшектердің бөлімдеріне бөліп, толықтауыш көбейткіштерін табамыз: біріншіге <b class="text-yellow-300">${ex.m1}</b>, екіншіге <b class="text-yellow-300">${ex.m2}</b>. Енді алымдары мен бөлімдерін осы сандарға көбейтеміз.`;
+            } else {
+                canvas.innerHTML = `
+                    <div class="flex flex-col items-center space-y-2">
+                        <span class="text-xs text-emerald-300 font-bold uppercase tracking-widest">Дұрыс шыққан соңғы жауабы:</span>
+                        <div class="flex items-center space-x-4 bg-slate-950 p-4 rounded-2xl border-2 border-emerald-400 shadow-2xl animate-bounce-short">
+                            <div class="fraction text-2xl font-black text-emerald-400">
+                                <span class="fraction-numerator border-emerald-400">${ex.r1[0]}</span>
+                                <span class="fraction-denominator">${ex.r1[1]}</span>
+                            </div>
+                            <span class="text-sm font-black text-white">және</span>
+                            <div class="fraction text-2xl font-black text-emerald-400">
+                                <span class="fraction-numerator border-emerald-400">${ex.r2[0]}</span>
+                                <span class="fraction-denominator">${ex.r2[1]}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                desc.innerHTML = `<strong>3-КЕЗЕҢ (ШЫҚҚАН ДАЙЫН ЖАУАП):</strong> Міне! Нәтижесінде <b class="text-emerald-300 text-base">${ex.r1[0]}/${ex.r1[1]}</b> және <b class="text-emerald-300 text-base">${ex.r2[0]}/${ex.r2[1]}</b> бөлшектері шығады. Есепті шығарғанда төмендегі бос орындарға дәл осылай осы екі бөлшекті жазасыз!`;
+            }
+        }
+
+        // --- Render Quizzes dynamically ---
+        function renderQuizzes() {
+            // Section 1
+            const grid1 = document.getElementById('quiz-grid-1');
+            grid1.innerHTML = qData1.map((q, i) => `
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between hover:border-indigo-300 transition">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs font-bold text-slate-400">${i + 1}.</span>
+                        <div class="mixed-fraction text-base">
+                            <span class="mr-1 text-slate-800">${q.w}</span>
+                            <div class="fraction text-indigo-600">
+                                <span class="fraction-numerator">${q.n}</span>
+                                <span class="fraction-denominator">${q.d}</span>
+                            </div>
+                        </div>
+                        <span class="font-bold text-slate-400 text-sm">=</span>
+                    </div>
+
+                    <div class="fraction items-center">
+                        <input type="number" id="q1-n-${i}" placeholder="?" class="w-12 h-8 text-center text-sm font-bold bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none mb-1">
+                        <div class="w-12 h-0.5 bg-slate-700"></div>
+                        <input type="number" id="q1-d-${i}" placeholder="?" class="w-12 h-8 text-center text-sm font-bold bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none mt-1">
+                    </div>
+                </div>
+            `).join('');
+
+            // Section 2
+            const grid2 = document.getElementById('quiz-grid-2');
+            grid2.innerHTML = qData2.map((q, i) => `
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between hover:border-emerald-300 transition">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs font-bold text-slate-400">${i + 1}.</span>
+                        <div class="fraction text-emerald-700 text-base">
+                            <span class="fraction-numerator">${q.n}</span>
+                            <span class="fraction-denominator">${q.d}</span>
+                        </div>
+                        <span class="font-bold text-slate-400 text-sm">=</span>
+                    </div>
+
+                    <div class="flex items-center space-x-1.5">
+                        <input type="number" id="q2-w-${i}" placeholder="?" class="w-10 h-10 text-center text-base font-bold bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        <div class="fraction items-center">
+                            <input type="number" id="q2-n-${i}" placeholder="?" class="w-10 h-7 text-center text-xs font-bold bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none mb-1">
+                            <div class="w-10 h-0.5 bg-slate-700"></div>
+                            <input type="number" id="q2-d-${i}" placeholder="?" class="w-10 h-7 text-center text-xs font-bold bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none mt-1">
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Section 3
+            const grid3 = document.getElementById('quiz-grid-3');
+            grid3.innerHTML = qData3.map((q, i) => `
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col justify-between space-y-2 hover:border-purple-300 transition">
+                    <div class="flex items-center space-x-2 text-xs font-bold">
+                        <span class="text-slate-400">${i + 1}.</span>
+                        <div class="fraction text-purple-700">
+                            <span class="fraction-numerator">${q.f1[0]}</span>
+                            <span class="fraction-denominator">${q.f1[1]}</span>
+                        </div>
+                        <span class="text-slate-400">және</span>
+                        <div class="fraction text-purple-700">
+                            <span class="fraction-numerator">${q.f2[0]}</span>
+                            <span class="fraction-denominator">${q.f2[1]}</span>
+                        </div>
+                        <span class="text-slate-400">→</span>
+                    </div>
+
+                    <div class="flex items-center justify-end space-x-2">
+                        <div class="fraction items-center">
+                            <input type="number" id="q3-n1-${i}" placeholder="?" class="w-11 h-8 text-center text-xs font-bold bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none mb-1">
+                            <div class="w-11 h-0.5 bg-slate-700"></div>
+                            <input type="number" id="q3-d1-${i}" placeholder="?" class="w-11 h-8 text-center text-xs font-bold bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none mt-1">
+                        </div>
+                        <span class="text-xs text-slate-400 font-bold">және</span>
+                        <div class="fraction items-center">
+                            <input type="number" id="q3-n2-${i}" placeholder="?" class="w-11 h-8 text-center text-xs font-bold bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none mb-1">
+                            <div class="w-11 h-0.5 bg-slate-700"></div>
+                            <input type="number" id="q3-d2-${i}" placeholder="?" class="w-11 h-8 text-center text-xs font-bold bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none mt-1">
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- Check and Show Individual Result for Sections ---
+        function checkSection(secNum) {
+            let nameInputId = `studentNameSec${secNum}`;
+            let studentName = document.getElementById(nameInputId).value.trim();
+
+            if (!studentName) {
+                studentName = document.getElementById('topStudentName').value.trim();
+            }
+
+            if (!studentName) {
+                alert('Өтініш, тексермес бұрын оқушының аты-жөнін жазыңыз!');
+                document.getElementById(nameInputId).focus();
+                return;
+            }
+
+            let correctCount = 0;
+
+            if (secNum === 1) {
+                qData1.forEach((q, i) => {
+                    const inputN = document.getElementById(`q1-n-${i}`);
+                    const inputD = document.getElementById(`q1-d-${i}`);
+                    const userN = parseInt(inputN.value);
+                    const userD = parseInt(inputD.value);
+
+                    if (userN === q.ansN && userD === q.ansD) {
+                        correctCount++;
+                        inputN.className = 'w-12 h-8 text-center text-sm font-bold bg-green-100 border-2 border-green-500 text-green-800 rounded-lg focus:outline-none';
+                        inputD.className = 'w-12 h-8 text-center text-sm font-bold bg-green-100 border-2 border-green-500 text-green-800 rounded-lg focus:outline-none';
+                    } else {
+                        inputN.className = 'w-12 h-8 text-center text-sm font-bold bg-red-100 border-2 border-red-400 text-red-800 rounded-lg focus:outline-none';
+                        inputD.className = 'w-12 h-8 text-center text-sm font-bold bg-red-100 border-2 border-red-400 text-red-800 rounded-lg focus:outline-none';
+                    }
+                });
+
+                document.getElementById('res1Student').innerText = `Оқушы: ${studentName}`;
+                document.getElementById('res1Score').innerText = `${correctCount} / 15`;
+                document.getElementById('res1Comment').innerText = getComment(correctCount);
+                document.getElementById('resultCard1').classList.remove('hidden');
+
+            } else if (secNum === 2) {
+                qData2.forEach((q, i) => {
+                    const inputW = document.getElementById(`q2-w-${i}`);
+                    const inputN = document.getElementById(`q2-n-${i}`);
+                    const inputD = document.getElementById(`q2-d-${i}`);
+                    
+                    const userW = parseInt(inputW.value);
+                    const userN = parseInt(inputN.value);
+                    const userD = parseInt(inputD.value);
+
+                    if (userW === q.ansW && userN === q.ansN && userD === q.ansD) {
+                        correctCount++;
+                        inputW.className = 'w-10 h-10 text-center text-base font-bold bg-green-100 border-2 border-green-500 text-green-800 rounded-xl focus:outline-none';
+                        inputN.className = 'w-10 h-7 text-center text-xs font-bold bg-green-100 border-2 border-green-500 text-green-800 rounded-lg focus:outline-none';
+                        inputD.className = 'w-10 h-7 text-center text-xs font-bold bg-green-100 border-2 border-green-500 text-green-800 rounded-lg focus:outline-none';
+                    } else {
+                        inputW.className = 'w-10 h-10 text-center text-base font-bold bg-red-100 border-2 border-red-400 text-red-800 rounded-xl focus:outline-none';
+                        inputN.className = 'w-10 h-7 text-center text-xs font-bold bg-red-100 border-2 border-red-400 text-red-800 rounded-lg focus:outline-none';
+                        inputD.className = 'w-10 h-7 text-center text-xs font-bold bg-red-100 border-2 border-red-400 text-red-800 rounded-lg focus:outline-none';
+                    }
+                });
+
+                document.getElementById('res2Student').innerText = `Оқушы: ${studentName}`;
+                document.getElementById('res2Score').innerText = `${correctCount} / 15`;
+                document.getElementById('res2Comment').innerText = getComment(correctCount);
+                document.getElementById('resultCard2').classList.remove('hidden');
+
+            } else if (secNum === 3) {
+                qData3.forEach((q, i) => {
+                    const inputN1 = document.getElementById(`q3-n1-${i}`);
+                    const inputD1 = document.getElementById(`q3-d1-${i}`);
+                    const inputN2 = document.getElementById(`q3-n2-${i}`);
+                    const inputD2 = document.getElementById(`q3-d2-${i}`);
+
+                    const uN1 = parseInt(inputN1.value);
+                    const uD1 = parseInt(inputD1.value);
+                    const uN2 = parseInt(inputN2.value);
+                    const uD2 = parseInt(inputD2.value);
+
+                    if (uN1 === q.ans1[0] && uD1 === q.ans1[1] && uN2 === q.ans2[0] && uD2 === q.ans2[1]) {
+                        correctCount++;
+                        inputN1.className = 'w-11 h-8 text-center text-xs font-bold bg-green-100 border-2 border-green-500 text-green-800 rounded-lg focus:outline-none';
+                        inputD1.className = 'w-11 h-8 text-center text-xs font-bold bg-green-100 border-2 border-green-500 text-green-800 rounded-lg focus:outline-none';
+                        inputN2.className = 'w-11 h-8 text-center text-xs font-bold bg-green-100 border-2 border-green-500 text-green-800 rounded-lg focus:outline-none';
+                        inputD2.className = 'w-11 h-8 text-center text-xs font-bold bg-green-100 border-2 border-green-500 text-green-800 rounded-lg focus:outline-none';
+                    } else {
+                        inputN1.className = 'w-11 h-8 text-center text-xs font-bold bg-red-100 border-2 border-red-400 text-red-800 rounded-lg focus:outline-none';
+                        inputD1.className = 'w-11 h-8 text-center text-xs font-bold bg-red-100 border-2 border-red-400 text-red-800 rounded-lg focus:outline-none';
+                        inputN2.className = 'w-11 h-8 text-center text-xs font-bold bg-red-100 border-2 border-red-400 text-red-800 rounded-lg focus:outline-none';
+                        inputD2.className = 'w-11 h-8 text-center text-xs font-bold bg-red-100 border-2 border-red-400 text-red-800 rounded-lg focus:outline-none';
+                    }
+                });
+
+                document.getElementById('res3Student').innerText = `Оқушы: ${studentName}`;
+                document.getElementById('res3Score').innerText = `${correctCount} / 15`;
+                document.getElementById('res3Comment').innerText = getComment(correctCount);
+                document.getElementById('resultCard3').classList.remove('hidden');
+            }
+        }
+
+        function getComment(score) {
+            const percent = Math.round((score / 15) * 100);
+            if (score === 15) return `Керемет! 100% Дұрыс. Тақырыпты өте үздік меңгергенсің! 🌟`;
+            if (score >= 12) return `Өте жақсы! (${percent}%). Кішкене ғана мұқият болу керек. 👍`;
+            if (score >= 8) return `Жақсы! (${percent}%). Қателермен жұмыс жасап, қайталап шық. 💪`;
+            return `Төмен нәтиже (${percent}%). Мысалдарды қайтадан мұқият қарап шық! 📖`;
+        }
+
+        // Initialize Page
+        window.onload = function() {
+            renderDemo1();
+            renderDemo2();
+            renderDemo3();
+            renderQuizzes();
+        };
+    </script>
+</body>
+</html>
